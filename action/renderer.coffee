@@ -5,6 +5,7 @@ pen = elem.getContext "2d"
 vertexes = []
 
 exports.draw = draw = (color, list) ->
+  pen.clearRect 0, 0, elem.offsetWidth, elem.offsetHeight
   pen.beginPath()
   if list[0]?
     {x, y} = list[0]
@@ -13,9 +14,9 @@ exports.draw = draw = (color, list) ->
   list[1..].forEach (point) ->
     {x, y} = point
     pen.lineTo x, y
-    console.log x, y
+    # console.log x, y
 
-  # pen.strokeStyle = color
+  pen.strokeStyle = color
   pen.stroke()
 
 exports.test = ->

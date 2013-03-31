@@ -5,27 +5,27 @@ check = (points...) ->
     unless (point.y < Infinity) then throw new Error "y"
 
 add = (a, b) ->
-  check a, b
+  # check a, b
   x: a.x + b.x
   y: a.y + b.y
 
 minus = (a, b) ->
-  check a, b
+  # check a, b
   x: a.x - b. x
   y: a.y - b. y
 
 multiply = (a, b) ->
-  check a, b
+  # check a, b
   x: (a.x * b.x) - (a.y * b.y)
   y: (a.x * b.y) + (a.y * b.x)
 
 conjugate = (a) ->
-  check a
+  # check a
   x: a.x
   y: - a.y
 
 divide = (a, b) ->
-  check a, b
+  # check a, b
   numberator = multiply a, (conjugate b)
   denominator = multiply b, (conjugate b)
   if (denominator.x is 0) and (denominator.y is 0)
@@ -34,19 +34,21 @@ divide = (a, b) ->
     x: numberator.x / denominator.x
     y: numberator.y / denominator.x
 
-grow = (origin, destination, path) ->
+each_grow = (origin, destination, path) ->
+  # console.log "given", origin, destination, path
   start = path[0]
   end = path[path.length - 1]
-  course = minus start, end
+  course = minus end, start
   whole_course = minus destination, origin
 
-  factor = divide course, whole_course
+  factor = divide whole_course, course
 
-  result = [start]
+  result = []
 
   path[1...-1].forEach (a) ->
-    b = multiply (minus a, start), factor
-    result.push (add origin, b)
+    b = minus a, start
+    c = multiply b, factor
+    result.push (add origin, c)
 
   result.push destination
   result
@@ -56,7 +58,7 @@ exports.bend = bend = (list, template) ->
   result = [base_point]
 
   list[1..].forEach (guide_point) ->
-    segment = grow base_point, guide_point, template
+    segment = each_grow base_point, guide_point, template
     result.push segment...
     base_point = guide_point
 
@@ -71,9 +73,9 @@ exports.test = ->
   print_more = (list) -> console.log join_point list
 
   path = [
-    {x: 1, y: 20}
-    {x: 50, y: 10}
-    {x: 20, y: 40}
+    {x: 10, y: 20}
+    {x: 24, y: 30}
+    {x: 30, y: 60}
   ]
 
   console.log (join_point (bend path, path))
@@ -81,4 +83,4 @@ exports.test = ->
   test_a = x: 5, y: 5
   test_b = x: 10, y: 0
 
-  print_point (divide test_a, test_b)
+  # print_point (divide test_a, test_b)

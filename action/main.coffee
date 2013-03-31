@@ -10,14 +10,35 @@ test = ->
   bender.test()
 
 path = [
-  {x: 100, y: 100}
-  {x: 200, y: 400}
-  {x: 300, y: 600}
+  {x: 100,  y: 100}
+  {x: 360,  y: 140}
+  {x: 460,  y: 240}
+  {x: 400,  y: 400}
+  {x: 500,  y: 300}
 ]
 
 test_curve = ->
-  course = bend path, path
-  console.log course
+  course = path
+  [1..4].forEach ->
+    course = bend course, path
   draw "hsl(240,90%,80%)", course
+  console.log course.length
 
-test()
+events = require "./events.coffee"
+global_map = {}
+
+# test()
+# test_curve()
+# events.test()
+
+events.on "update", (data) ->
+  result = []
+  for key, value of data
+    result.push value
+  course = result.concat()
+  [1..4].forEach ->
+    course = bend course, result
+  draw  "hsl(240,80%,40%)", course
+
+drop = require "./drop.coffee"
+drop.init global_map, events

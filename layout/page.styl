@@ -34,4 +34,25 @@ body
   #options
     width 300px
 
+.drop
+  width 20px
+  height 20px
+  font-size 12px
+  position absolute
+
 // colors here
+
+.drop
+  font-family Monaco
+  background hsl(240,80,80)
+  border-radius 8px
+  color white
+  padding 3px
+  cursor move
+  // -webkit-transition-duration 0.1s
+  user-select none
+  -webkit-user-select none
+
+  &:hover
+    box-shadow 0px 0px 8px hsl(0,0,70)
+    -webkit-transform scale(1.1)
