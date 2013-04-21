@@ -20,8 +20,4 @@ exports.draw = draw = (color, list) ->
   pen.stroke()
 
 exports.test = ->
-  draw "hsla(0,0%,80%, 0.7)", [
-    {x: 100, y: 10}
-    {x: 20, y: 40}
-    {x: 40, y: 60}
-    ]
+  draw "hsla(0,0%,80%, 0.7)", [ {x: 100, y: 10}, {x: 20, y: 40}, {x: 40, y: 60}]

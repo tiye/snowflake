@@ -9,13 +9,7 @@ test = ->
   renderer.test()
   bender.test()
 
-path = [
-  {x: 100,  y: 100}
-  {x: 360,  y: 140}
-  {x: 460,  y: 240}
-  {x: 400,  y: 400}
-  {x: 500,  y: 300}
-]
+path = [ {x: 100,  y: 100}, {x: 360,  y: 140}, {x: 460,  y: 240}, {x: 400,  y: 400}, {x: 500,  y: 300 }]
 
 test_curve = ->
   course = path
@@ -42,3 +36,5 @@ events.on "update", (data) ->
 
 drop = require "./drop.coffee"
 drop.init global_map, events
+
+console.log 'started'
