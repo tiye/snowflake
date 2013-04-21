@@ -72,7 +72,11 @@ exports.test = ->
   print_point = (point) -> console.log show_point point
   print_more = (list) -> console.log join_point list
 
-  path = [{x: 10, y: 20}, {x: 24, y: 30},{x: 30, y: 60}]
+  path = [
+    {x: 10, y: 20}
+    {x: 24, y: 30}
+    {x: 30, y: 60}
+  ]
 
   console.log (join_point (bend path, path))
 

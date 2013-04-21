@@ -1,0 +1,2 @@
+
+require("./render").test()

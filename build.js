@@ -49,143 +49,79 @@
   require.define = function (file, fn) {
     require.modules[file] = fn;
   };
-  require.define('/action/main.coffee', function (module, exports, __dirname, __filename) {
-    var bend, bender, draw, drop, events, global_map, path, renderer, test, test_curve;
-    renderer = require('/action/renderer.coffee', module);
-    bender = require('/action/bender.coffee', module);
-    draw = renderer.draw;
-    bend = bender.bend;
-    test = function () {
-      renderer.test();
-      return bender.test();
-    };
-    path = [
-      {
-        x: 100,
-        y: 100
-      },
-      {
-        x: 360,
-        y: 140
-      },
-      {
-        x: 460,
-        y: 240
-      },
-      {
-        x: 400,
-        y: 400
-      },
-      {
-        x: 500,
-        y: 300
+  require.define('/coffee/main.coffee', function (module, exports, __dirname, __filename) {
+    require('/coffee/render.coffee', module).test();
+  });
+  require.define('/coffee/render.coffee', function (module, exports, __dirname, __filename) {
+    var bend, draw, elem, events, level, pen, poke, test;
+    events = require('events', module);
+    bend = require('/coffee/bend.coffee', module).bend;
+    poke = new events.EventEmitter;
+    elem = require('/coffee/dom.coffee', module).find('#paper');
+    pen = elem.getContext('2d');
+    level = 8;
+    draw = function (list) {
+      var cache$, x, y;
+      pen.clearRect(0, 0, elem.offsetWidth, elem.offsetHeight);
+      pen.beginPath();
+      if (null != list[0]) {
+        cache$ = list[0];
+        x = cache$.x;
+        y = cache$.y;
+        pen.moveTo(x, y);
       }
-    ];
-    test_curve = function () {
-      var course;
-      course = path;
-      [
-        1,
-        2,
-        3,
-        4
-      ].forEach(function () {
-        return course = bend(course, path);
+      list.slice(1).forEach(function (point) {
+        var cache$1;
+        cache$1 = point;
+        x = cache$1.x;
+        y = cache$1.y;
+        return pen.lineTo(x, y);
       });
-      draw('hsl(240,90%,80%)', course);
-      return console.log(course.length);
+      return pen.stroke();
     };
-    events = require('/action/events.coffee', module);
-    global_map = {};
-    events.on('update', function (data) {
-      var course, key, result, value;
-      result = [];
-      for (key in data) {
-        value = data[key];
-        result.push(value);
-      }
-      course = result.concat();
-      [
-        1,
-        2,
-        3,
-        4
-      ].forEach(function () {
-        return course = bend(course, result);
-      });
-      return draw('hsl(240,80%,40%)', course);
+    poke.on('color', function (color) {
+      return pen.strokeStyle = color;
     });
-    drop = require('/action/drop.coffee', module);
-    drop.init(global_map, events);
-    console.log('started');
+    poke.on('level', function (number) {
+      return level = number;
+    });
+    test = function () {
+      var path;
+      path = [
+        {
+          x: 100,
+          y: 10
+        },
+        {
+          x: 20,
+          y: 40
+        },
+        {
+          x: 40,
+          y: 60
+        }
+      ];
+      return draw(path);
+    };
+    poke.on('render', function (data) {
+      var path, template;
+      path = data.concat();
+      template = data.concat();
+      (function () {
+        var accum$;
+        accum$ = [];
+        for (var i$ = 1; 1 <= level ? i$ <= level : i$ >= level; 1 <= level ? ++i$ : --i$)
+          accum$.push(i$);
+        return accum$;
+      }.apply(this, arguments)(function () {
+        return path = bend(path, template);
+      }));
+      return draw(path);
+    });
+    exports.poke = poke;
+    exports.test = test;
   });
-  require.define('/action/drop.coffee', function (module, exports, __dirname, __filename) {
-    var area, count, create, dom, init, random;
-    count = {
-      data: 0,
-      'new': function () {
-        return this.data += 1;
-      }
-    };
-    random = function (n) {
-      if (null == n)
-        n = 600;
-      return Math.random() * n;
-    };
-    dom = require('/action/dom.coffee', module);
-    area = dom.find('#cover');
-    create = function (map, events) {
-      var drop, id;
-      id = count['new']();
-      drop = dom.drop(id);
-      area.appendChild(drop);
-      map[id] = {
-        elem: drop,
-        x: random(),
-        y: random()
-      };
-      drop.style.top = '' + map[id].y + 'px';
-      drop.style.left = '' + map[id].x + 'px';
-      drop.ondragstart = function (drag) {
-      };
-      drop.ondragend = function (drag) {
-        drop.style.top = '' + (drag.offsetY + drop.offsetTop) + 'px';
-        drop.style.left = '' + (drag.offsetX + drop.offsetLeft) + 'px';
-        return console.log(map);
-      };
-      return drop.ondrag = function (drag) {
-        var x, y;
-        x = drag.offsetX + drop.offsetLeft;
-        y = drag.offsetY + drop.offsetTop;
-        map[id].x = x;
-        map[id].y = y;
-        return events.trigger('update', map);
-      };
-    };
-    exports.init = init = function (registry, events) {
-      create(registry, events);
-      create(registry, events);
-      create(registry, events);
-      create(registry, events);
-      window.expose = {};
-      exports.add = expose.add = function () {
-        create(registry, events);
-        return events.trigger('update', registry);
-      };
-      return exports.remove = expose.remove = function () {
-        var elem, keys, last_one;
-        keys = Object.keys(registry);
-        last_one = keys[keys.length - 1];
-        console;
-        elem = registry[last_one].elem;
-        elem.parentElement.removeChild(elem);
-        if (null != last_one)
-          delete registry[last_one];
-        return events.trigger('update', registry);
-      };
-    };
-  });
-  require.define('/action/dom.coffee', function (module, exports, __dirname, __filename) {
+  require.define('/coffee/dom.coffee', function (module, exports, __dirname, __filename) {
     exports.find = function (query) {
       return document.querySelector(query);
     };
@@ -198,56 +134,7 @@
       return div;
     };
   });
-  require.define('/action/events.coffee', function (module, exports, __dirname, __filename) {
-    var data;
-    data = {};
-    exports.on = function (name, callback) {
-      if (!(null != data[name]))
-        data[name] = [];
-      if (!in$(callback, data[name]))
-        return data[name].push(callback);
-    };
-    exports.trigger = function (name, args) {
-      args = 2 <= arguments.length ? [].slice.call(arguments, 1) : [];
-      if (null != data[name])
-        return data[name].forEach(function (callback) {
-          return callback.apply(null, [].slice.call(args).concat());
-        });
-    };
-    exports.remove = function (name, callback) {
-      var side;
-      if (null != data[name])
-        if (null != callback) {
-          side = [];
-          data[name].forEach(function (the_one) {
-            if (!(callback === the_one))
-              return side.push(the_one);
-          });
-          if (side.length > 0) {
-            return data[name] = side;
-          } else {
-            return delete data[name];
-          }
-        } else {
-          return delete data[name];
-        }
-    };
-    exports.test = function () {
-      exports.on('test', function () {
-        return console.log('a test');
-      });
-      exports.trigger('test');
-      exports.remove('test');
-      return exports.trigger('test');
-    };
-    function in$(member, list) {
-      for (var i = 0, length = list.length; i < length; ++i)
-        if (i in list && list[i] === member)
-          return true;
-      return false;
-    }
-  });
-  require.define('/action/bender.coffee', function (module, exports, __dirname, __filename) {
+  require.define('/coffee/bend.coffee', function (module, exports, __dirname, __filename) {
     var add, bend, check, conjugate, divide, each_grow, minus, multiply;
     check = function (points) {
       points = 1 <= arguments.length ? [].slice.call(arguments, 0) : [];
@@ -365,63 +252,143 @@
         y: 0
       };
     };
-    function in$(member, list) {
-      for (var i = 0, length = list.length; i < length; ++i)
-        if (i in list && list[i] === member)
-          return true;
-      return false;
-    }
   });
-  require.define('/action/renderer.coffee', function (module, exports, __dirname, __filename) {
-    var draw, elem, pen, vertexes;
-    elem = require('/action/dom.coffee', module).find('#paper');
-    pen = elem.getContext('2d');
-    vertexes = [];
-    exports.draw = draw = function (color, list) {
-      var cache$, x, y;
-      pen.clearRect(0, 0, elem.offsetWidth, elem.offsetHeight);
-      pen.beginPath();
-      if (null != list[0]) {
-        cache$ = list[0];
-        x = cache$.x;
-        y = cache$.y;
-        pen.moveTo(x, y);
-      }
-      list.slice(1).forEach(function (point) {
-        var cache$1;
-        cache$1 = point;
-        x = cache$1.x;
-        y = cache$1.y;
-        return pen.lineTo(x, y);
-      });
-      pen.strokeStyle = color;
-      return pen.stroke();
+  require.define('events', function (module, exports, __dirname, __filename) {
+    if (!process.EventEmitter)
+      process.EventEmitter = function () {
+      };
+    var EventEmitter = exports.EventEmitter = process.EventEmitter;
+    var isArray = typeof Array.isArray === 'function' ? Array.isArray : function (xs) {
+        return Object.prototype.toString.call(xs) === '[object Array]';
+      };
+    ;
+    var defaultMaxListeners = 10;
+    EventEmitter.prototype.setMaxListeners = function (n) {
+      if (!this._events)
+        this._events = {};
+      this._events.maxListeners = n;
     };
-    exports.test = function () {
-      return draw('hsla(0,0%,80%, 0.7)', [
-        {
-          x: 100,
-          y: 10
-        },
-        {
-          x: 20,
-          y: 40
-        },
-        {
-          x: 40,
-          y: 60
+    EventEmitter.prototype.emit = function (type) {
+      if (type === 'error') {
+        if (!this._events || !this._events.error || isArray(this._events.error) && !this._events.error.length) {
+          if (arguments[1] instanceof Error) {
+            throw arguments[1];
+          } else {
+            throw new Error("Uncaught, unspecified 'error' event.");
+          }
+          return false;
         }
-      ]);
+      }
+      if (!this._events)
+        return false;
+      var handler = this._events[type];
+      if (!handler)
+        return false;
+      if (typeof handler == 'function') {
+        switch (arguments.length) {
+        case 1:
+          handler.call(this);
+          break;
+        case 2:
+          handler.call(this, arguments[1]);
+          break;
+        case 3:
+          handler.call(this, arguments[1], arguments[2]);
+          break;
+        default:
+          var args = Array.prototype.slice.call(arguments, 1);
+          handler.apply(this, args);
+        }
+        return true;
+      } else if (isArray(handler)) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        var listeners = handler.slice();
+        for (var i = 0, l = listeners.length; i < l; i++) {
+          listeners[i].apply(this, args);
+        }
+        return true;
+      } else {
+        return false;
+      }
     };
-    function in$(member, list) {
-      for (var i = 0, length = list.length; i < length; ++i)
-        if (i in list && list[i] === member)
-          return true;
-      return false;
-    }
+    EventEmitter.prototype.addListener = function (type, listener) {
+      if ('function' !== typeof listener) {
+        throw new Error('addListener only takes instances of Function');
+      }
+      if (!this._events)
+        this._events = {};
+      this.emit('newListener', type, listener);
+      if (!this._events[type]) {
+        this._events[type] = listener;
+      } else if (isArray(this._events[type])) {
+        if (!this._events[type].warned) {
+          var m;
+          if (this._events.maxListeners !== undefined) {
+            m = this._events.maxListeners;
+          } else {
+            m = defaultMaxListeners;
+          }
+          if (m && m > 0 && this._events[type].length > m) {
+            this._events[type].warned = true;
+            console.error('(node) warning: possible EventEmitter memory ' + 'leak detected. %d listeners added. ' + 'Use emitter.setMaxListeners() to increase limit.', this._events[type].length);
+            console.trace();
+          }
+        }
+        this._events[type].push(listener);
+      } else {
+        this._events[type] = [
+          this._events[type],
+          listener
+        ];
+      }
+      return this;
+    };
+    EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+    EventEmitter.prototype.once = function (type, listener) {
+      var self = this;
+      self.on(type, function g() {
+        self.removeListener(type, g);
+        listener.apply(this, arguments);
+      });
+      return this;
+    };
+    EventEmitter.prototype.removeListener = function (type, listener) {
+      if ('function' !== typeof listener) {
+        throw new Error('removeListener only takes instances of Function');
+      }
+      if (!this._events || !this._events[type])
+        return this;
+      var list = this._events[type];
+      if (isArray(list)) {
+        var i = list.indexOf(listener);
+        if (i < 0)
+          return this;
+        list.splice(i, 1);
+        if (list.length == 0)
+          delete this._events[type];
+      } else if (this._events[type] === listener) {
+        delete this._events[type];
+      }
+      return this;
+    };
+    EventEmitter.prototype.removeAllListeners = function (type) {
+      if (type && this._events && this._events[type])
+        this._events[type] = null;
+      return this;
+    };
+    EventEmitter.prototype.listeners = function (type) {
+      if (!this._events)
+        this._events = {};
+      if (!this._events[type])
+        this._events[type] = [];
+      if (!isArray(this._events[type])) {
+        this._events[type] = [this._events[type]];
+      }
+      return this._events[type];
+    };
   });
-  require('/action/main.coffee');
+  require('/coffee/main.coffee');
 }.call(this, this));
 /*
-//@ sourceMappingURL=show/build.map
+//@ sourceMappingURL=build/build.map
 */

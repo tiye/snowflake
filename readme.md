@@ -1,10 +1,5 @@
 
-## Snowflake
+Snowflake: dragging fractals
+------
 
-Compile with browserify:
-
-```bash
-browserify -t coffeeify action/main.coffee -d > build.js
-```
-
-Live Demo maybe: http://jiyinyiyong.github.com/snowflake
+Compile the code with `cake dev`.
