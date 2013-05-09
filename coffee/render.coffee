@@ -2,7 +2,7 @@
 events = require "events"
 {bend} = require "./bend"
 
-poke = new events.EventEmitter
+chan = new events.EventEmitter
 
 elem = require("./dom.coffee").find "#paper"
 pen = elem.getContext "2d"
@@ -23,10 +23,10 @@ draw = (list) ->
 
   pen.stroke()
 
-poke.on "color", (color) ->
+chan.on "color", (color) ->
   pen.strokeStyle = color
 
-poke.on "level", (number) ->
+chan.on "level", (number) ->
   level = number
 
 test = ->
@@ -37,7 +37,7 @@ test = ->
   ]
   draw path
 
-poke.on "render", (data) ->
+chan.on "render", (data) ->
   # data should be list of points [{x, y}]
   path = data.concat()
   template = data.concat()
@@ -45,5 +45,5 @@ poke.on "render", (data) ->
     path = bend path, template
   draw path
 
-exports.poke = poke
+exports.chan = chan
 exports.test = test

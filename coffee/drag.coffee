@@ -1,56 +1,53 @@
 
 events = require "events"
-poke = new events.EventEmitter
-
-count =
-  data: 0
-  new: -> @data += 1
+exports.chan = chan = new events.EventEmitter
 
 random = (n = 600) -> Math.random() * n
 
 dom = require("./dom.coffee")
 area = dom.find("#cover")
 
-registry = {}
+class Point extends events.EventEmitter
+  constructor: (@id) ->
+    @elem = dom.new()
+    @elem.onmousedown = @mouse_down
+    @elem.onmouseup = @mouse_up
+    @elem.onmousemove = @mouse_move
+    @dragging = no
+    @attrs = {}
 
-drag_update = (drag, drop) ->
-  x = drag.offsetX + drop.offsetLeft
-  y = drag.offsetY + drop.offsetTop
-  drop.style.left = "#{x}px"
-  drop.style.top = "#{y}px"
-  registry[id].x = x
-  registry[id].y = y
-  poke.emit "update", registry
+    # todo dragging state
 
-create = ->
-  id = count.new()
-  drop = dom.drop id
-  area.appendChild drop
-  registry[id] =
-    elem: drop
-    x: random()
-    y: random()
+  mouse_down: ->
+    @dragging = yes
+    console.log "mouse down"
 
-  drop.style.top = "#{registry[id].y}px"
-  drop.style.left = "#{registry[id].x}px"
+  mouse_up: ->
+    @dragging = yes
+    console.log "mouse up"
 
-  drop.ondrag = (drag) ->
-    drag_update drag, drop
+  set: (key, value) -> @[key] = value
+  get: (key) -> @[key]
 
-poke.on "init", ->
-  create() for _ in [1..4]
+  mouse_move: (event) ->
+    vertexes
 
-poke.on "more", ->
-  create()
-  poke.emit "update"
+vertexes =
+  data: []
+  more: ->
+    id = @data.length
+    point = new Point id
+    @data.push point
+    @notify()
 
-poke.on "less", ->
-  keys = Object.keys registry
-  last_one = keys[keys.length - 1]
-  elem = registry[last_one].elem
-  elem.parentElement.removeChild elem
-  delete registry[last_one] if last_one?
-  events.trigger "update", registry
-  poke.emit "update"
+  less: ->
+    @data.pop()
+    @notify()
 
-exports.poke = poke
+  notify: ->
+    data = []
+    @data.forEach (point) =>
+      data.push
+        x: point.get "x"
+        y: point.get "y"
+    @emit "update", data
