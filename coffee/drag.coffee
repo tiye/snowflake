@@ -2,46 +2,102 @@
 events = require "events"
 exports.chan = chan = new events.EventEmitter
 
+{g} = require "log-group"
+g.set "mouse", off
+g.set "move", off
+g.set "watch x", off
+g.set "points", off
+
 random = (n = 600) -> Math.random() * n
 
+elem_radius = 10
+
 dom = require("./dom.coffee")
-area = dom.find("#cover")
+
+paper = dom.info "#cover"
 
 class Point extends events.EventEmitter
   constructor: (@id) ->
-    @elem = dom.new()
-    @elem.onmousedown = @mouse_down
-    @elem.onmouseup = @mouse_up
-    @elem.onmousemove = @mouse_move
+    @elem = dom.make_point @id
     @dragging = no
     @attrs = {}
+    @listen_mouse()
+
+    @random_position()
+    @emit "update"
 
     # todo dragging state
+  listen_mouse: =>
+    mouse = dom.global_mouse()
+    mouse.on "down", (event) =>
+      if event.target.id is @elem.id
+        @mouse_down event
 
-  mouse_down: ->
+    mouse.on "up", (event) =>
+      if @dragging then @mouse_up()
+
+    mouse.on "move", (event) =>
+      if @dragging then @mouse_move event
+
+    @elem.onmousedown = (event) =>
+      g "mouse", "mouse down", event
+      @set "on_x", event.layerX
+      @set "on_y", event.layerY
+
+  mouse_down: (event) =>
     @dragging = yes
-    console.log "mouse down"
+    g "mouse", "mouse down", event
 
-  mouse_up: ->
-    @dragging = yes
-    console.log "mouse up"
+    @set "start_x", event.layerX
+    @set "start_y", event.layerY
 
-  set: (key, value) -> @[key] = value
-  get: (key) -> @[key]
+  mouse_up: =>
+    @dragging = no
+    g "mouse", "mouse up"
 
-  mouse_move: (event) ->
-    vertexes
+  mouse_move: (event) =>
+    if @dragging
+      g "mouse", "dragging", event
+      now_x = event.layerX
+      now_y = event.layerY
+      pos_x = now_x - (@get "start_x") - (@get "on_x")
+      pos_y = now_y - (@get "start_y") - (@get "on_y")
+      g "move", pos_x, pos_y
+      if (pos_x > 0) and (pos_y > 0)
+        @set "x", pos_x
+        @set "y", pos_y
+        @elem.style.left = "#{pos_x + elem_radius}px"
+        @elem.style.top = "#{pos_y + elem_radius}px"
+        @emit "update"
+
+  set: (key, value) => @[key] = value
+  get: (key) => @[key]
+
+  random_position: =>
+    x = random paper.width
+    y = random paper.height
+    @set "x", (x + elem_radius)
+    @set "y", (y + elem_radius)
+    @elem.style.left = "#{x - elem_radius}px"
+    @elem.style.top = "#{y - elem_radius}px"
+
+  remove: ->
+    dom.remove @elem
 
 vertexes =
   data: []
   more: ->
+    console.log "more"
     id = @data.length
     point = new Point id
     @data.push point
     @notify()
 
+    point.on "update", => @notify()
+
   less: ->
-    @data.pop()
+    point = @data.pop()
+    point.remove()
     @notify()
 
   notify: ->
@@ -50,4 +106,16 @@ vertexes =
       data.push
         x: point.get "x"
         y: point.get "y"
-    @emit "update", data
+
+    g "points", data
+    exports.chan.emit "update", data
+
+chan.on "init", ->
+  console.log "init"
+  [1..4].map -> vertexes.more()
+
+chan.on "more", -> vertexes.more()
+
+chan.on "less", -> vertexes.less()
+
+chan.on "trigger", -> vertexes.notify()

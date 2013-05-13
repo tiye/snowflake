@@ -5,3 +5,7 @@ Array::remove = (item) ->
   all
 
 window.global = {}
+{g} = require "log-group"
+
+g.attrs =
+  mouse: yes
