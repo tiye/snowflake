@@ -125,21 +125,6 @@
       render.emit('color', 'hsla(40,60%,60%,0.6)');
       return drag.emit('trigger');
     };
-    function isOwn$(o, p) {
-      return {}.hasOwnProperty.call(o, p);
-    }
-    function extends$(child, parent) {
-      for (var key in parent)
-        if (isOwn$(parent, key))
-          child[key] = parent[key];
-      function ctor() {
-        this.constructor = child;
-      }
-      ctor.prototype = parent.prototype;
-      child.prototype = new ctor;
-      child.__super__ = parent.prototype;
-      return child;
-    }
   });
   require.define('/coffee/render.coffee', function (module, exports, __dirname, __filename) {
     var bend, chan, draw, elem, events, level, pen, test, thickness, timestamp;
@@ -235,21 +220,6 @@
     });
     exports.chan = chan;
     exports.test = test;
-    function isOwn$(o, p) {
-      return {}.hasOwnProperty.call(o, p);
-    }
-    function extends$(child, parent) {
-      for (var key in parent)
-        if (isOwn$(parent, key))
-          child[key] = parent[key];
-      function ctor() {
-        this.constructor = child;
-      }
-      ctor.prototype = parent.prototype;
-      child.prototype = new ctor;
-      child.__super__ = parent.prototype;
-      return child;
-    }
   });
   require.define('/coffee/dom.coffee', function (module, exports, __dirname, __filename) {
     var events, q;
