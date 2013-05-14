@@ -53,5 +53,18 @@ window.onload = ->
     else
       dom.q("#paper").className = ""
 
+  dom.q("#save").onclick = ->
+    window.open dom.q("canvas").toDataURL()
+
+  dom.q("#white").onclick = ->
+    render.emit "color", "hsl(0,0%,100%)"
+    drag.emit "trigger"
+  dom.q("#red").onclick = ->
+    render.emit "color", "hsl(0,80%,50%)"
+    drag.emit "trigger"
+  dom.q("#blue").onclick = ->
+    render.emit "color", "hsl(240,80%,50%)"
+    drag.emit "trigger"
+
   render.emit "color", "hsla(40,60%,60%,0.6)"
   drag.emit "trigger"

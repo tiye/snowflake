@@ -107,6 +107,21 @@
           return dom.q('#paper').className = '';
         }
       };
+      dom.q('#save').onclick = function () {
+        return window.open(dom.q('canvas').toDataURL());
+      };
+      dom.q('#white').onclick = function () {
+        render.emit('color', 'hsl(0,0%,100%)');
+        return drag.emit('trigger');
+      };
+      dom.q('#red').onclick = function () {
+        render.emit('color', 'hsl(0,80%,50%)');
+        return drag.emit('trigger');
+      };
+      dom.q('#blue').onclick = function () {
+        render.emit('color', 'hsl(240,80%,50%)');
+        return drag.emit('trigger');
+      };
       render.emit('color', 'hsla(40,60%,60%,0.6)');
       return drag.emit('trigger');
     };
