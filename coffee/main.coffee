@@ -8,6 +8,9 @@ global.debug =
 width = 1000
 height = 600
 
+{g} = require "log-group"
+g.set "clas", on
+
 dom = require("./dom")
 
 window.onload = ->
@@ -29,12 +32,26 @@ window.onload = ->
 
   dom.q("#more").onclick = -> drag.emit "more"
   dom.q("#less").onclick = -> drag.emit "less"
+  dom.q("#thicker").onclick = ->
+    render.emit "thicker"
+    drag.emit "trigger"
+  dom.q("#thiner").onclick = ->
+    render.emit "thiner"
+    drag.emit "trigger"
   dom.q("#greater").onclick = ->
     render.emit "greater"
     drag.emit "trigger"
   dom.q("#smaller").onclick = ->
     render.emit "smaller"
     drag.emit "trigger"
+
+  dom.q("#rotate").onclick = ->
+    clas = dom.q("#paper").className
+    g "clas", clas
+    if clas.trim() is ""
+      dom.q("#paper").className = "rotate"
+    else
+      dom.q("#paper").className = ""
 
   render.emit "color", "hsla(40,60%,60%,0.6)"
   drag.emit "trigger"

@@ -9,6 +9,7 @@ pen = elem.getContext "2d"
 
 level = 0
 timestamp = (new Date).getTime()
+thickness = 1
 
 draw = (list) ->
   pen.clearRect 0, 0, elem.offsetWidth, elem.offsetHeight
@@ -30,6 +31,8 @@ chan.on "color", (color) ->
 chan.on "level", (number) ->
   level = number
 
+
+
 test = ->
   path = [
     {x: 100, y: 10}
@@ -50,6 +53,13 @@ chan.on "render", (data) ->
 
 chan.on "greater", -> level += 1
 chan.on "smaller", -> level -= 1 if level > 0
+
+chan.on "thicker", ->
+  thickness += 1
+  pen.lineWidth = thickness
+chan.on "thiner", ->
+  thickness -= 1 if thickness > 1
+  pen.lineWidth = thickness
 
 chan.on "update", (data) ->
   time = (new Date).getTime()

@@ -51,7 +51,7 @@
       };
     }();
   require.define('/coffee/main.coffee', function (module, exports, __dirname, __filename) {
-    var dom, height, width;
+    var dom, g, height, width;
     require('/coffee/extend.coffee', module);
     global.debug = {
       raw_mouse: false,
@@ -59,6 +59,8 @@
     };
     width = 1e3;
     height = 600;
+    g = require('/node_modules/log-group/lib/index.js', module).g;
+    g.set('clas', true);
     dom = require('/coffee/dom.coffee', module);
     window.onload = function () {
       var drag, render;
@@ -79,6 +81,14 @@
       dom.q('#less').onclick = function () {
         return drag.emit('less');
       };
+      dom.q('#thicker').onclick = function () {
+        render.emit('thicker');
+        return drag.emit('trigger');
+      };
+      dom.q('#thiner').onclick = function () {
+        render.emit('thiner');
+        return drag.emit('trigger');
+      };
       dom.q('#greater').onclick = function () {
         render.emit('greater');
         return drag.emit('trigger');
@@ -86,6 +96,16 @@
       dom.q('#smaller').onclick = function () {
         render.emit('smaller');
         return drag.emit('trigger');
+      };
+      dom.q('#rotate').onclick = function () {
+        var clas;
+        clas = dom.q('#paper').className;
+        g('clas', clas);
+        if (clas.trim() === '') {
+          return dom.q('#paper').className = 'rotate';
+        } else {
+          return dom.q('#paper').className = '';
+        }
       };
       render.emit('color', 'hsla(40,60%,60%,0.6)');
       return drag.emit('trigger');
@@ -107,7 +127,7 @@
     }
   });
   require.define('/coffee/render.coffee', function (module, exports, __dirname, __filename) {
-    var bend, chan, draw, elem, events, level, pen, test, timestamp;
+    var bend, chan, draw, elem, events, level, pen, test, thickness, timestamp;
     events = require('events', module);
     bend = require('/coffee/bend.coffee', module).bend;
     chan = new events.EventEmitter;
@@ -115,6 +135,7 @@
     pen = elem.getContext('2d');
     level = 0;
     timestamp = new Date().getTime();
+    thickness = 1;
     draw = function (list) {
       var cache$, x, y;
       pen.clearRect(0, 0, elem.offsetWidth, elem.offsetHeight);
@@ -180,6 +201,15 @@
     chan.on('smaller', function () {
       if (level > 0)
         return level -= 1;
+    });
+    chan.on('thicker', function () {
+      thickness += 1;
+      return pen.lineWidth = thickness;
+    });
+    chan.on('thiner', function () {
+      if (thickness > 1)
+        thickness -= 1;
+      return pen.lineWidth = thickness;
     });
     chan.on('update', function (data) {
       var time;
@@ -276,21 +306,6 @@
     exports.chan.on('normal', function () {
       return q('.current').className = 'drag';
     });
-    function isOwn$(o, p) {
-      return {}.hasOwnProperty.call(o, p);
-    }
-    function extends$(child, parent) {
-      for (var key in parent)
-        if (isOwn$(parent, key))
-          child[key] = parent[key];
-      function ctor() {
-        this.constructor = child;
-      }
-      ctor.prototype = parent.prototype;
-      child.prototype = new ctor;
-      child.__super__ = parent.prototype;
-      return child;
-    }
   });
   require.define('events', function (module, exports, __dirname, __filename) {
     if (!process.EventEmitter)
@@ -552,21 +567,6 @@
         y: 0
       };
     };
-    function isOwn$(o, p) {
-      return {}.hasOwnProperty.call(o, p);
-    }
-    function extends$(child, parent) {
-      for (var key in parent)
-        if (isOwn$(parent, key))
-          child[key] = parent[key];
-      function ctor() {
-        this.constructor = child;
-      }
-      ctor.prototype = parent.prototype;
-      child.prototype = new ctor;
-      child.__super__ = parent.prototype;
-      return child;
-    }
   });
   require.define('/coffee/drag.coffee', function (module, exports, __dirname, __filename) {
     var chan, dom, elem_radius, events, g, paper, Point, random, vertexes;

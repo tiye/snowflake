@@ -23,6 +23,10 @@ body {
   left: 0px;
   -webkit-user-select: none;
   user-select: none;
+  opacity: 0;
+}
+#main #center #cover:hover {
+  opacity: 1;
 }
 #main #options {
   width: 300px;
@@ -51,15 +55,27 @@ body {
 }
 #options {
   font-family: Monaco;
-  cursor: pointer;
   color: #f0a8a8;
 }
 #options div:hover {
+  cursor: pointer;
   color: #fff;
 }
 .current {
   text-shadow: 0px 0px 10px #fff;
   cursor: move;
   -webkit-transform: scale(2);
-  cursor: drag;
+  cursor: move;
+}
+.rotate {
+  -webkit-animation: rotate 8s infinite linear;
+}
+@-webkit-keyframes rotate {
+  0% {
+    -webkit-transform: perspective(400px) rotateY(0deg);
+  }
+
+  100% {
+    -webkit-transform: perspective(400px) rotateY(360deg);
+  }
 }
