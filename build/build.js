@@ -184,7 +184,7 @@
     chan.on('update', function (data) {
       var time;
       time = new Date().getTime();
-      if (time - timestamp > 200)
+      if (time - timestamp > 140)
         chan.emit('render', data);
       return timestamp = time;
     });
@@ -271,11 +271,9 @@
     };
     exports.chan = new events.EventEmitter;
     exports.chan.on('pointer', function (elem) {
-      q('#cover').style.cursor = 'pointer';
       return elem.className = 'drag current';
     });
     exports.chan.on('normal', function () {
-      q('#cover').style.cursor = 'normal';
       return q('.current').className = 'drag';
     });
     function isOwn$(o, p) {

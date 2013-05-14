@@ -53,7 +53,7 @@ chan.on "smaller", -> level -= 1 if level > 0
 
 chan.on "update", (data) ->
   time = (new Date).getTime()
-  if (time - timestamp) > 200 then chan.emit "render", data
+  if (time - timestamp) > 140 then chan.emit "render", data
   timestamp = time
 
 exports.chan = chan

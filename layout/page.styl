@@ -29,7 +29,9 @@ body
     #cover
       position absolute
       top 0px
-      left 0px
+      left 0px    
+      -webkit-user-select none
+      user-select none
 
   #options
     width 300px
@@ -72,5 +74,6 @@ body
 
 .current
   text-shadow 0px 0px 10px white
-  cursor pointer
+  cursor move
   -webkit-transform scale(2)
+  cursor drag
