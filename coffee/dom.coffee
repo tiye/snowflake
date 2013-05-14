@@ -50,3 +50,13 @@ exports.global_mouse = ->
 
 exports.remove = (elem) ->
   elem.parentElement.removeChild elem
+
+exports.chan = new events.EventEmitter
+
+exports.chan.on "pointer", (elem) ->
+  q("#cover").style.cursor = "pointer"
+  elem.className = "drag current"
+
+exports.chan.on "normal", ->
+  q("#cover").style.cursor = "normal"
+  q(".current").className = "drag"

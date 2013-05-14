@@ -25,23 +25,38 @@ body {
 #main #options {
   width: 300px;
 }
+#main #options div {
+  margin: 10px 0px;
+  padding-left: 8px;
+}
 .drag {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
   font-size: 12px;
   position: absolute;
 }
 .drag {
   font-family: Monaco;
-  background: #a3a3f5;
   border-radius: 8px;
   color: #fff;
-  padding: 3px;
   cursor: move;
   user-select: none;
   -webkit-user-select: none;
 }
 .drag:hover {
-  box-shadow: 0px 0px 8px #b3b3b3;
-  -webkit-transform: scale(1.1);
+  -webkit-transform: scale(2);
+}
+#options {
+  font-family: Monaco;
+  cursor: pointer;
+  color: #f0a8a8;
+}
+#options div:hover {
+  color: #fff;
+}
+.current {
+  text-shadow: 0px 0px 10px #fff;
+  cursor: pointer;
+  -webkit-transform: scale(2);
 }

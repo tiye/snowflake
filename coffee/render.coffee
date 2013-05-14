@@ -7,7 +7,8 @@ chan = new events.EventEmitter
 elem = require("./dom.coffee").find "#paper"
 pen = elem.getContext "2d"
 
-level = 5
+level = 0
+timestamp = (new Date).getTime()
 
 draw = (list) ->
   pen.clearRect 0, 0, elem.offsetWidth, elem.offsetHeight
@@ -41,13 +42,19 @@ chan.on "render", (data) ->
   # data should be list of points [{x, y}]
   path = JSON.parse JSON.stringify(data)
   template = JSON.parse JSON.stringify(data)
-  [1..level].forEach ->
-    path = bend path, template
+  if level > 0
+    [1..level].forEach ->
+      path = bend path, template
   draw path
   # console.log JSON.stringify data
 
 chan.on "greater", -> level += 1
-chan.on "smaller", -> level -= 1
+chan.on "smaller", -> level -= 1 if level > 0
+
+chan.on "update", (data) ->
+  time = (new Date).getTime()
+  if (time - timestamp) > 200 then chan.emit "render", data
+  timestamp = time
 
 exports.chan = chan
 exports.test = test

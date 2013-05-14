@@ -10,7 +10,7 @@ g.set "points", off
 
 random = (n = 600) -> Math.random() * n
 
-elem_radius = 10
+elem_radius = 8
 
 dom = require("./dom.coffee")
 
@@ -50,10 +50,12 @@ class Point extends events.EventEmitter
 
     @set "start_x", event.layerX
     @set "start_y", event.layerY
+    dom.chan.emit "pointer", @elem
 
   mouse_up: =>
     @dragging = no
     g "mouse", "mouse up"
+    dom.chan.emit "normal"
 
   mouse_move: (event) =>
     if @dragging
@@ -63,11 +65,11 @@ class Point extends events.EventEmitter
       pos_x = now_x - (@get "start_x") - (@get "on_x")
       pos_y = now_y - (@get "start_y") - (@get "on_y")
       g "move", pos_x, pos_y
-      if (pos_x > 0) and (pos_y > 0)
-        @set "x", pos_x
-        @set "y", pos_y
-        @elem.style.left = "#{pos_x + elem_radius}px"
-        @elem.style.top = "#{pos_y + elem_radius}px"
+      if (pos_x > 10) and (pos_y > 10)
+        @set "x", (pos_x + elem_radius)
+        @set "y", (pos_y + elem_radius)
+        @elem.style.left = "#{@get "x"}px"
+        @elem.style.top = "#{@get "y"}px"
         @emit "update"
 
   set: (key, value) => @[key] = value
@@ -78,8 +80,8 @@ class Point extends events.EventEmitter
     y = random paper.height
     @set "x", (x + elem_radius)
     @set "y", (y + elem_radius)
-    @elem.style.left = "#{x - elem_radius}px"
-    @elem.style.top = "#{y - elem_radius}px"
+    @elem.style.left = "#{@get "x"}px"
+    @elem.style.top = "#{@get "y"}px"
 
   remove: ->
     dom.remove @elem
@@ -104,8 +106,8 @@ vertexes =
     data = []
     @data.forEach (point) =>
       data.push
-        x: point.get "x"
-        y: point.get "y"
+        x: (point.get "x") + elem_radius
+        y: (point.get "y") + elem_radius
 
     g "points", data
     exports.chan.emit "update", data

@@ -34,6 +34,9 @@ divide = (a, b) ->
     x: numberator.x / denominator.x
     y: numberator.y / denominator.x
 
+square = (a) -> Math.pow a, 2
+distance = (a, b) -> square(a.x - b.x) + square(a.y - b.y)
+
 each_grow = (origin, destination, path) ->
   # console.log "given", origin, destination, path
   start = path[0]
@@ -58,9 +61,10 @@ exports.bend = bend = (list, template) ->
   result = [base_point]
 
   list[1..].forEach (guide_point) ->
-    segment = each_grow base_point, guide_point, template
-    result.push segment...
-    base_point = guide_point
+    if 1 < (distance guide_point, base_point) < 800000
+      segment = each_grow base_point, guide_point, template
+      result.push segment...
+      base_point = guide_point
 
   result
 
