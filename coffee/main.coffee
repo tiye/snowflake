@@ -5,7 +5,7 @@ global.debug =
   raw_mouse: no
   wrapped_mouse: yes
 
-width = 1000
+width = 1200
 height = 600
 
 {g} = require "log-group"

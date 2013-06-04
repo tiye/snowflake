@@ -62,8 +62,8 @@ class Point extends events.EventEmitter
       g "mouse", "dragging", event
       now_x = event.layerX
       now_y = event.layerY
-      pos_x = now_x - (@get "start_x") - (@get "on_x")
-      pos_y = now_y - (@get "start_y") - (@get "on_y")
+      pos_x = now_x # - (@get "start_x") - (@get "on_x")
+      pos_y = now_y # - (@get "start_y") - (@get "on_y")
       g "move", pos_x, pos_y
       if (pos_x > 10) and (pos_y > 10)
         @set "x", (pos_x + elem_radius)
