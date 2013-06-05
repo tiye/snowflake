@@ -58,11 +58,11 @@ canvas {
 }
 #options {
   font-family: Monaco;
-  color: #821717;
+  color: #baabab;
 }
 #options div:hover {
   cursor: pointer;
-  color: #fff;
+  color: #000;
 }
 .current {
   text-shadow: 0px 0px 10px #fff;

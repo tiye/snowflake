@@ -7,6 +7,8 @@ g.set "mouse", off
 g.set "move", off
 g.set "watch x", off
 g.set "points", off
+g.set 'find bug', off
+g.set 'start position', off
 
 random = (n = 600) -> Math.random() * n
 
@@ -40,16 +42,17 @@ class Point extends events.EventEmitter
       if @dragging then @mouse_move event
 
     @elem.onmousedown = (event) =>
-      g "mouse", "mouse down", event
-      @set "on_x", event.layerX
-      @set "on_y", event.layerY
+      g "mouse", "mouse down", event.offsetX, event.offsetY
+      g 'start position', event, event.offsetX, event.offsetY
+      @set "on_x", event.offsetX
+      @set "on_y", event.offsetY
 
   mouse_down: (event) =>
     @dragging = yes
     g "mouse", "mouse down", event
 
-    @set "start_x", event.layerX
-    @set "start_y", event.layerY
+    @set "start_x", event.offsetX
+    @set "start_y", event.offsetY
     dom.chan.emit "pointer", @elem
 
   mouse_up: =>
@@ -59,11 +62,12 @@ class Point extends events.EventEmitter
 
   mouse_move: (event) =>
     if @dragging
-      g "mouse", "dragging", event
-      now_x = event.layerX
-      now_y = event.layerY
-      pos_x = now_x # - (@get "start_x") - (@get "on_x")
-      pos_y = now_y # - (@get "start_y") - (@get "on_y")
+      g 'mouse', 'dragging', event.offsetY, event.offsetY
+      now_x = event.offsetX
+      now_y = event.offsetY
+      g 'find bug', (@get 'start_x'), (@get 'on_x')
+      pos_x = now_x - (@get "start_x") - (@get "on_x")
+      pos_y = now_y - (@get "start_y") - (@get "on_y")
       g "move", pos_x, pos_y
       if (pos_x > 10) and (pos_y > 10)
         @set "x", (pos_x + elem_radius)
@@ -76,8 +80,8 @@ class Point extends events.EventEmitter
   get: (key) => @[key]
 
   random_position: =>
-    x = random paper.width
-    y = random paper.height
+    x = (paper.width / 2) + (random paper.width/8)
+    y = (paper.height / 2) - (random paper.width/8)
     @set "x", (x + elem_radius)
     @set "y", (y + elem_radius)
     @elem.style.left = "#{@get "x"}px"

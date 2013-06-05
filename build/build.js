@@ -110,8 +110,8 @@
       dom.q('#save').onclick = function () {
         return window.open(dom.q('canvas').toDataURL());
       };
-      dom.q('#white').onclick = function () {
-        render.emit('color', 'hsl(0,0%,100%)');
+      dom.q('#black').onclick = function () {
+        render.emit('color', 'hsl(0,0%,0%)');
         return drag.emit('trigger');
       };
       dom.q('#red').onclick = function () {
@@ -122,7 +122,7 @@
         render.emit('color', 'hsl(240,80%,50%)');
         return drag.emit('trigger');
       };
-      render.emit('color', 'hsla(40,60%,60%,0.6)');
+      render.emit('color', 'hsla(40,60%,60%,1)');
       return drag.emit('trigger');
     };
     function isOwn$(o, p) {
@@ -577,6 +577,8 @@
     g.set('move', false);
     g.set('watch x', false);
     g.set('points', false);
+    g.set('find bug', false);
+    g.set('start position', false);
     random = function (n) {
       if (null == n)
         n = 600;
@@ -635,16 +637,17 @@
             return this$2.mouse_move(event);
         }));
         return this.elem.onmousedown = (this$3 = this, function (event) {
-          g('mouse', 'mouse down', event);
-          this$3.set('on_x', event.layerX);
-          return this$3.set('on_y', event.layerY);
+          g('mouse', 'mouse down', event.offsetX, event.offsetY);
+          g('start position', event, event.offsetX, event.offsetY);
+          this$3.set('on_x', event.offsetX);
+          return this$3.set('on_y', event.offsetY);
         });
       };
       Point.prototype.mouse_down = function (event) {
         this.dragging = true;
         g('mouse', 'mouse down', event);
-        this.set('start_x', event.layerX);
-        this.set('start_y', event.layerY);
+        this.set('start_x', event.offsetX);
+        this.set('start_y', event.offsetY);
         return dom.chan.emit('pointer', this.elem);
       };
       Point.prototype.mouse_up = function () {
@@ -655,11 +658,12 @@
       Point.prototype.mouse_move = function (event) {
         var now_x, now_y, pos_x, pos_y;
         if (this.dragging) {
-          g('mouse', 'dragging', event);
-          now_x = event.layerX;
-          now_y = event.layerY;
-          pos_x = now_x;
-          pos_y = now_y;
+          g('mouse', 'dragging', event.offsetY, event.offsetY);
+          now_x = event.offsetX;
+          now_y = event.offsetY;
+          g('find bug', this.get('start_x'), this.get('on_x'));
+          pos_x = now_x - this.get('start_x') - this.get('on_x');
+          pos_y = now_y - this.get('start_y') - this.get('on_y');
           g('move', pos_x, pos_y);
           if (pos_x > 10 && pos_y > 10) {
             this.set('x', pos_x + elem_radius);
@@ -678,8 +682,8 @@
       };
       Point.prototype.random_position = function () {
         var x, y;
-        x = random(paper.width);
-        y = random(paper.height);
+        x = paper.width / 2 + random(paper.width / 8);
+        y = paper.height / 2 - random(paper.width / 8);
         this.set('x', x + elem_radius);
         this.set('y', y + elem_radius);
         this.elem.style.left = '' + this.get('x') + 'px';

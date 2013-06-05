@@ -56,8 +56,8 @@ window.onload = ->
   dom.q("#save").onclick = ->
     window.open dom.q("canvas").toDataURL()
 
-  dom.q("#white").onclick = ->
-    render.emit "color", "hsl(0,0%,100%)"
+  dom.q("#black").onclick = ->
+    render.emit "color", "hsl(0,0%,0%)"
     drag.emit "trigger"
   dom.q("#red").onclick = ->
     render.emit "color", "hsl(0,80%,50%)"
@@ -66,5 +66,5 @@ window.onload = ->
     render.emit "color", "hsl(240,80%,50%)"
     drag.emit "trigger"
 
-  render.emit "color", "hsla(40,60%,60%,0.6)"
+  render.emit "color", "hsla(40,60%,60%,1)"
   drag.emit "trigger"
