@@ -2,14 +2,27 @@
 Snowflake: dragging fractals
 ------
 
-Start modify the code by running `node-dev dev.coffee`.  
-This is my personal app for my paper, and `three-quater` is the other part.  
-Most ideas come from 'Recusive Drawing'. I'm merely drawing curves here.  
+Most ideas are from [Recusive Drawing][draw]. I only draw curve here.
+
+[draw]: http://recursivedrawing.com/
+
+### Edit
+
+```bash
+git clone git@github.com:jiyinyiyong/snowflake.git
+cd snowflake
+bower install
+node-dev calabash # if you have these two commands installed
+```
 
 Visit the HTML pages with Chrome to see how it works:  
-http://jiyinyiyong.github.io/snowflake/build/
+http://repo.jiyinyiyong.me/snowflake/
 
-License
-------
+### Thanks
+
+PIXI https://github.com/GoodBoyDigital/pixi.js
+PIXI Demo http://www.goodboydigital.com/pixijs/examples/13/
+
+### License
 
 MIT
