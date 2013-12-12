@@ -1,90 +1,71 @@
 
-check = (points...) ->
-  points.forEach (point) ->
-    unless (point.x < Infinity) then throw new Error "x"
-    unless (point.y < Infinity) then throw new Error "y"
+define ->
 
-add = (a, b) ->
-  # check a, b
-  x: a.x + b.x
-  y: a.y + b.y
+  check = (points...) ->
+    points.forEach (point) ->
+      unless (point.x < Infinity) then throw new Error "x"
+      unless (point.y < Infinity) then throw new Error "y"
 
-minus = (a, b) ->
-  # check a, b
-  x: a.x - b. x
-  y: a.y - b. y
+  add = (a, b) ->
+    # check a, b
+    x: a.x + b.x
+    y: a.y + b.y
 
-multiply = (a, b) ->
-  # check a, b
-  x: (a.x * b.x) - (a.y * b.y)
-  y: (a.x * b.y) + (a.y * b.x)
+  minus = (a, b) ->
+    # check a, b
+    x: a.x - b. x
+    y: a.y - b. y
 
-conjugate = (a) ->
-  # check a
-  x: a.x
-  y: - a.y
+  multiply = (a, b) ->
+    # check a, b
+    x: (a.x * b.x) - (a.y * b.y)
+    y: (a.x * b.y) + (a.y * b.x)
 
-divide = (a, b) ->
-  # check a, b
-  numberator = multiply a, (conjugate b)
-  denominator = multiply b, (conjugate b)
-  if (denominator.x is 0) and (denominator.y is 0)
-    x: 0, y: 0
-  else
-    x: numberator.x / denominator.x
-    y: numberator.y / denominator.x
+  conjugate = (a) ->
+    # check a
+    x: a.x
+    y: - a.y
 
-square = (a) -> Math.pow a, 2
-distance = (a, b) -> square(a.x - b.x) + square(a.y - b.y)
+  divide = (a, b) ->
+    # check a, b
+    numberator = multiply a, (conjugate b)
+    denominator = multiply b, (conjugate b)
+    if (denominator.x is 0) and (denominator.y is 0)
+      x: 0, y: 0
+    else
+      x: numberator.x / denominator.x
+      y: numberator.y / denominator.x
 
-each_grow = (origin, destination, path) ->
-  # console.log "given", origin, destination, path
-  start = path[0]
-  end = path[path.length - 1]
-  course = minus end, start
-  whole_course = minus destination, origin
+  square = (a) -> Math.pow a, 2
+  distance = (a, b) -> square(a.x - b.x) + square(a.y - b.y)
 
-  factor = divide whole_course, course
+  each_grow = (origin, destination, path) ->
+    # console.log "given", origin, destination, path
+    start = path[0]
+    end = path[path.length - 1]
+    course = minus end, start
+    whole_course = minus destination, origin
 
-  result = []
+    factor = divide whole_course, course
 
-  path[1...-1].forEach (a) ->
-    b = minus a, start
-    c = multiply b, factor
-    result.push (add origin, c)
+    result = []
 
-  result.push destination
-  result
+    path[1...-1].forEach (a) ->
+      b = minus a, start
+      c = multiply b, factor
+      result.push (add origin, c)
 
-exports.bend = bend = (list, template) ->
-  base_point = list[0]
-  result = [base_point]
+    result.push destination
+    result
 
-  list[1..].forEach (guide_point) ->
-    if 1 < (distance guide_point, base_point) < 800000
-      segment = each_grow base_point, guide_point, template
-      result.push segment...
-      base_point = guide_point
+  (list, template) ->
+    base_point = list[0]
+    result = [base_point]
 
-  result
+    list[1..].forEach (guide_point) ->
+      if 1 < (distance guide_point, base_point) < 800000
+        segment = each_grow base_point, guide_point, template
+        result.push segment...
+        base_point = guide_point
 
-exports.test = ->
-
-  show_point = (point) ->
-    "(#{point.x.toFixed 2}, #{point.y.toFixed 2})"
-  join_point = (list) -> list.map(show_point).join " "
-  print_point = (point) -> console.log show_point point
-  print_more = (list) -> console.log join_point list
-
-  path = [
-    {x: 10, y: 20}
-    {x: 24, y: 30}
-    {x: 30, y: 60}
-  ]
-
-  console.log (join_point (bend path, path))
-
-  test_a = x: 5, y: 5
-  test_b = x: 10, y: 0
-
-  # print_point (divide test_a, test_b)
+    result

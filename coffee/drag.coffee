@@ -1,127 +1,60 @@
 
-events = require "events"
-exports.chan = chan = new events.EventEmitter
+define (require, exports) ->
 
-{g} = require "log-group"
-g.set "mouse", off
-g.set "move", off
-g.set "watch x", off
-g.set "points", off
-g.set 'find bug', off
-g.set 'start position', off
+  local = {}
 
-random = (n = 600) -> Math.random() * n
+  size = require './size'
 
-elem_radius = 8
+  cover = $ '#cover'
 
-dom = require("./dom.coffee")
+  make_point = ->
+    elem = $ "<div class='point'>#{cover.children().length}</div>"
+    pos = size.random_position()
+    elem.css 'top', "#{pos.y}px"
+    elem.css 'left', "#{pos.x}px"
+    cover.append elem
 
-paper = dom.info "#cover"
+    elem.on 'dragstart', (event) ->
+      console.log elem, event
 
-class Point extends events.EventEmitter
-  constructor: (@id) ->
-    @elem = dom.make_point @id
-    @dragging = no
-    @attrs = {}
-    @listen_mouse()
+  make_point()
+  make_point()
 
-    @random_position()
-    @emit "update"
+  get_positions = ->
+    $.map $('#cover').children(), (child) ->
+      x: parseInt $(child).css 'left'
+      y: parseInt $(child).css 'top'
 
-    # todo dragging state
-  listen_mouse: =>
-    mouse = dom.global_mouse()
-    mouse.on "down", (event) =>
-      if event.target.id is @elem.id
-        @mouse_down event
+  $('#increase').click ->
+    make_point()
+    local.notify get_positions()
 
-    mouse.on "up", (event) =>
-      if @dragging then @mouse_up()
+  $('#decrease').click ->
+    cover.children().last().off().remove()
+    local.notify get_positions()
 
-    mouse.on "move", (event) =>
-      if @dragging then @mouse_move event
+  dragging = no
+  cacheElem = null
 
-    @elem.onmousedown = (event) =>
-      g "mouse", "mouse down", event.offsetX, event.offsetY
-      g 'start position', event, event.offsetX, event.offsetY
-      @set "on_x", event.offsetX
-      @set "on_y", event.offsetY
+  $('#cover').mousedown (event) ->
+    if $(event.target).is('.point')
+      dragging = yes
+      cacheElem = $ event.target
 
-  mouse_down: (event) =>
-    @dragging = yes
-    g "mouse", "mouse down", event
+  $('#cover').mouseup ->
+    dragging = no
+    cacheElem = null
 
-    @set "start_x", event.offsetX
-    @set "start_y", event.offsetY
-    dom.chan.emit "pointer", @elem
+  $('#cover').mousemove (event) ->
+    if dragging
+      cacheElem.css 'left', "#{event.x}px"
+      cacheElem.css 'top', "#{event.y}px"
+      local.notify get_positions()
 
-  mouse_up: =>
-    @dragging = no
-    g "mouse", "mouse up"
-    dom.chan.emit "normal"
+  exports.listen = (handler) ->
+    local.notify = handler
 
-  mouse_move: (event) =>
-    if @dragging
-      g 'mouse', 'dragging', event.offsetY, event.offsetY
-      now_x = event.offsetX
-      now_y = event.offsetY
-      g 'find bug', (@get 'start_x'), (@get 'on_x')
-      pos_x = now_x - (@get "start_x") - (@get "on_x")
-      pos_y = now_y - (@get "start_y") - (@get "on_y")
-      g "move", pos_x, pos_y
-      if (pos_x > 10) and (pos_y > 10)
-        @set "x", (pos_x + elem_radius)
-        @set "y", (pos_y + elem_radius)
-        @elem.style.left = "#{@get "x"}px"
-        @elem.style.top = "#{@get "y"}px"
-        @emit "update"
+  exports.demo = ->
+    local.notify get_positions()
 
-  set: (key, value) => @[key] = value
-  get: (key) => @[key]
-
-  random_position: =>
-    x = (paper.width / 2) + (random paper.width/8)
-    y = (paper.height / 2) - (random paper.width/8)
-    @set "x", (x + elem_radius)
-    @set "y", (y + elem_radius)
-    @elem.style.left = "#{@get "x"}px"
-    @elem.style.top = "#{@get "y"}px"
-
-  remove: ->
-    dom.remove @elem
-
-vertexes =
-  data: []
-  more: ->
-    console.log "more"
-    id = @data.length
-    point = new Point id
-    @data.push point
-    @notify()
-
-    point.on "update", => @notify()
-
-  less: ->
-    point = @data.pop()
-    point.remove()
-    @notify()
-
-  notify: ->
-    data = []
-    @data.forEach (point) =>
-      data.push
-        x: (point.get "x") + elem_radius
-        y: (point.get "y") + elem_radius
-
-    g "points", data
-    exports.chan.emit "update", data
-
-chan.on "init", ->
-  console.log "init"
-  [1..4].map -> vertexes.more()
-
-chan.on "more", -> vertexes.more()
-
-chan.on "less", -> vertexes.less()
-
-chan.on "trigger", -> vertexes.notify()
+  exports

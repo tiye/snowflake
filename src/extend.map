@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "file": "extend.js",
+  "sourceRoot": "..",
+  "sources": [
+    "coffee/extend.coffee"
+  ],
+  "names": [],
+  "mappings": ";AACA,CAAK,EAAW,CAAA,CAAX,CAAL,GAAO;CACL,KAAA,EAAA;CAAA,CAAA,CAAA;CACA,CAAA,EAAA;;AAAoB,CAAA;UAAA,iCAAA;sBAAA;CAAA,EAAA,EAAO;CAAP;;CAApB;CAAA,EAAG,CAAH;IADA;CADc,QAGd;CAHc;;AAKhB,CALA,CAAA,CAKgB,GAAV"
+}

@@ -1,70 +1,41 @@
 
-events = require "events"
-{bend} = require "./bend"
+define (require, exports) ->
 
-chan = new events.EventEmitter
+  size = require './size'
+  bend = require './bend'
 
-elem = require("./dom.coffee").find "#paper"
-pen = elem.getContext "2d"
+  renderer = PIXI.autoDetectRenderer size.w, size.h
+  stage = new PIXI.Stage 0xFFFFFF, true
 
-level = 0
-timestamp = (new Date).getTime()
-thickness = 1
+  $('#paper').append renderer.view
 
-draw = (list) ->
-  pen.clearRect 0, 0, elem.offsetWidth, elem.offsetHeight
-  pen.beginPath()
-  if list[0]?
-    {x, y} = list[0]
-    pen.moveTo x, y
-  
-  list[1..].forEach (point) ->
-    {x, y} = point
-    pen.lineTo x, y
-    # console.log x, y
+  thing = new PIXI.Graphics()
+  stage.addChild thing
 
-  pen.stroke()
+  local = {}
+  local.points = []
+  local.caches = []
 
-chan.on "color", (color) ->
-  pen.strokeStyle = color
+  animate = ->
+    thing.clear()
+    thing.lineStyle 1, 0x4444aa, 1
 
-chan.on "level", (number) ->
-  level = number
+    first = local.caches[0]
+    if first?
+      thing.moveTo first.x, first.y
+    local.caches[1..].forEach (point) ->
+      thing.lineTo point.x, point.y
 
+    renderer.render stage
+    requestAnimationFrame animate
 
+  animate()
 
-test = ->
-  path = [
-    {x: 100, y: 10}
-    {x: 20, y: 40}
-    {x: 40, y: 60}
-  ]
-  draw path
+  exports.set_points = (points) ->
+    local.points = points
+    tmp = points.concat()
+    [1..5].forEach ->
+      tmp = bend tmp, points
+    local.caches = tmp
 
-chan.on "render", (data) ->
-  # data should be list of points [{x, y}]
-  path = JSON.parse JSON.stringify(data)
-  template = JSON.parse JSON.stringify(data)
-  if level > 0
-    [1..level].forEach ->
-      path = bend path, template
-  draw path
-  # console.log JSON.stringify data
-
-chan.on "greater", -> level += 1
-chan.on "smaller", -> level -= 1 if level > 0
-
-chan.on "thicker", ->
-  thickness += 1
-  pen.lineWidth = thickness
-chan.on "thiner", ->
-  thickness -= 1 if thickness > 1
-  pen.lineWidth = thickness
-
-chan.on "update", (data) ->
-  time = (new Date).getTime()
-  if (time - timestamp) > 140 then chan.emit "render", data
-  timestamp = time
-
-exports.chan = chan
-exports.test = test
+  exports

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="style/page.css">
+    <script src="bower_components/seajs/sea.js"></script>
+    <script src="bower_components/pixijs/pixi.js"></script>
+    <script src="bower_components/zepto/zepto.js"></script>
+    <script type="text/javascript">
+    seajs.config({
+      base: './src/'
+    })
+    seajs.use('main')
+    </script>
+  </head>
+  <body>
+    <div id="main">
+      <div id="paper"></div>
+      <div id="cover"></div>
+    </div>
+    <div id="control">
+      <div id="increase">+</div>
+      <div id="decrease">-</div>
+    </div>
+  </body>
+</html>
