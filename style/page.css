@@ -3,6 +3,8 @@
 }
 body {
   margin: 0px;
+  font-family: Monaco;
+  font-size: 10px;
 }
 
 #main {
@@ -21,28 +23,21 @@ body {
 }
 
 #control {
-    position: absolute;
-    top: 0;
-    right: 100px;
-    display: flex;
-}
-
-#control>div {
-    width: 20px;
-    text-align: center;
-    background-color: hsl(240, 21%, 67%);
-    margin: 0px 1px;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-}
-#control>div:active {
-  background: white;
+    top: 80px;
 }
 
 #increase {}
 
 #decrease {}
+
+#level {
+    position: absolute;
+    right: 0;
+    top: 120px;
+}
+
+#more {}
+#less {}
 
 .point {
     position: absolute;
@@ -58,4 +53,24 @@ body {
 }
 
 .point:hover {
+}
+
+.group {
+    position: absolute;
+    display: flex;
+    right: 0;
+}
+
+.button {
+    width: 20px;
+    text-align: center;
+    background-color: hsl(240, 21%, 67%);
+    margin: 0px 1px;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.button:active {
+  background: white;
 }

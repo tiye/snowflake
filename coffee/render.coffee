@@ -15,6 +15,7 @@ define (require, exports) ->
   local = {}
   local.points = []
   local.caches = []
+  local.level = 6
 
   animate = ->
     thing.clear()
@@ -33,9 +34,20 @@ define (require, exports) ->
 
   exports.set_points = (points) ->
     local.points = points
-    tmp = points.concat()
-    [1..5].forEach ->
-      tmp = bend tmp, points
+    update_cache()
+
+  update_cache = ->
+    tmp = local.points.concat()
+    [1..local.level].forEach ->
+      tmp = bend tmp, local.points
     local.caches = tmp
+
+  $('#more').click ->
+    local.level += 1
+    update_cache()
+  $('#less').click ->
+    if local.level > 2
+      local.level -= 1
+      update_cache()
 
   exports
